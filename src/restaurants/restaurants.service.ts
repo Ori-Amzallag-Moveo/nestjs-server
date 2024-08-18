@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage } from 'mongoose';
+import { Model } from 'mongoose';
 import { Restaurant } from './restaurant.model';
+import { getCurrentTime, isRestaurantOpen } from './helpers/restaurant.utils';
 
 @Injectable()
 export class RestaurantsService {
@@ -10,99 +11,40 @@ export class RestaurantsService {
     private readonly restaurantModel: Model<Restaurant>,
   ) {}
 
-  async getAllRestaurants(query: any): Promise<Restaurant[]> {
-    const filter = {};
-    if (query.isPopular === 'true') {
-      filter['rating'] = { $gte: 4 };
+  async getAllRestaurants(
+    query: any,
+    isPopular?: string,
+    isOpenNow?: string,
+    isNewRestaurant?: string,
+  ): Promise<Restaurant[]> {
+    const mongoQuery: any = { ...query };
+
+    if (isPopular === 'true') {
+      mongoQuery.rating = { $gte: 4 };
     }
-    return this.restaurantModel.find(filter).populate('chef', 'name').exec();
-  }
 
-  async getPopularRestaurants(): Promise<Restaurant[]> {
-    const pipeline: PipelineStage[] = [
-      { $match: { rating: { $gte: 4 } } },
-      {
-        $lookup: {
-          from: 'chefs',
-          localField: 'chef',
-          foreignField: '_id',
-          as: 'chef',
-        },
-      },
-      { $unwind: { path: '$chef', preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          name: 1,
-          slug: 1,
-          imageSrc: 1,
-          rating: 1,
-          isPopular: 1,
-          isNewRestaurant: 1,
-          isOpenNow: 1,
-          location: 1,
-          'chef.name': 1,
-        },
-      },
-    ];
-    return this.restaurantModel.aggregate(pipeline).exec();
-  }
+    if (isNewRestaurant === 'true') {
+      const threeYearsAgo = new Date();
+      threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 4);
+      mongoQuery.dateOfEstablishment = { $gte: threeYearsAgo };
+    }
 
-  async getNewRestaurants(): Promise<Restaurant[]> {
-    const pipeline: PipelineStage[] = [
-      { $match: { isNewRestaurant: true } },
-      {
-        $lookup: {
-          from: 'chefs',
-          localField: 'chef',
-          foreignField: '_id',
-          as: 'chef',
-        },
-      },
-      { $unwind: { path: '$chef', preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          name: 1,
-          slug: 1,
-          imageSrc: 1,
-          rating: 1,
-          isPopular: 1,
-          isNewRestaurant: 1,
-          isOpenNow: 1,
-          location: 1,
-          'chef.name': 1,
-        },
-      },
-    ];
-    return this.restaurantModel.aggregate(pipeline).exec();
-  }
+    const restaurants = await this.restaurantModel
+      .find(mongoQuery)
+      .populate('chef', 'name')
+      .exec();
 
-  async getOpenRestaurants(): Promise<Restaurant[]> {
-    const pipeline: PipelineStage[] = [
-      { $match: { isOpenNow: true } },
-      {
-        $lookup: {
-          from: 'chefs',
-          localField: 'chef',
-          foreignField: '_id',
-          as: 'chef',
-        },
-      },
-      { $unwind: { path: '$chef', preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          name: 1,
-          slug: 1,
-          imageSrc: 1,
-          rating: 1,
-          isPopular: 1,
-          isNewRestaurant: 1,
-          isOpenNow: 1,
-          location: 1,
-          'chef.name': 1,
-        },
-      },
-    ];
-    return this.restaurantModel.aggregate(pipeline).exec();
+    if (isOpenNow === 'true') {
+      const currentTime = getCurrentTime();
+
+      const openRestaurants = restaurants.filter((restaurant) =>
+        isRestaurantOpen(restaurant, currentTime),
+      );
+
+      return openRestaurants;
+    }
+
+    return restaurants;
   }
 
   async getRestaurantById(id: string): Promise<Restaurant | null> {

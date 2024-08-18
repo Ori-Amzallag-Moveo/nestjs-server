@@ -16,72 +16,25 @@ import { RestaurantsService } from './restaurants.service';
 export class RestaurantsController {
   constructor(private restaurantService: RestaurantsService) {}
 
-  // @desc     Get all restaurants, with optional filters
+  // @desc     Get all restaurants, with optional 'Params'
   // @route    GET /api/v1/restaurants
   // @access   Public
   @Get()
   async getRestaurants(
-    @Query('isPopular') isPopular?: string,
-    @Query('isNewRestaurant') isNewRestaurant?: string,
-    @Query('isOpenNow') isOpenNow?: string,
+    @Query('isPopular') isPopular: string,
+    @Query('isNewRestaurant') isNewRestaurant: string,
+    @Query('isOpenNow') isOpenNow: string,
   ) {
     try {
       const query: any = {};
 
-      if (isPopular) query.isPopular = isPopular === 'true';
-      if (isNewRestaurant) query.isNewRestaurant = isNewRestaurant === 'true';
-      if (isOpenNow) query.isOpenNow = isOpenNow === 'true';
-
-      const restaurants = await this.restaurantService.getAllRestaurants(query);
+      const restaurants = await this.restaurantService.getAllRestaurants(
+        query,
+        isPopular,
+        isOpenNow,
+        isNewRestaurant,
+      );
       return { success: true, data: restaurants };
-    } catch (error) {
-      throw new HttpException(
-        { success: false, error: error.message },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-  // @desc     Get popular restaurants
-  // @route    GET /api/v1/restaurants/popular
-  // @access   Public
-  @Get('popular')
-  async getPopularRestaurants() {
-    try {
-      const popularRestaurants =
-        await this.restaurantService.getPopularRestaurants();
-      return { success: true, data: popularRestaurants };
-    } catch (error) {
-      throw new HttpException(
-        { success: false, error: error.message },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  // @desc     Get new restaurants
-  // @route    GET /api/v1/restaurants/new
-  // @access   Public
-  @Get('new')
-  async getNewRestaurants() {
-    try {
-      const newRestaurants = await this.restaurantService.getNewRestaurants();
-      return { success: true, data: newRestaurants };
-    } catch (error) {
-      throw new HttpException(
-        { success: false, error: error.message },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  // @desc     Get open restaurants
-  // @route    GET /api/v1/restaurants/open
-  // @access   Public
-  @Get('open')
-  async getOpenRestaurants() {
-    try {
-      const openRestaurants = await this.restaurantService.getOpenRestaurants();
-      return { success: true, data: openRestaurants };
     } catch (error) {
       throw new HttpException(
         { success: false, error: error.message },

@@ -8,6 +8,7 @@ import {
   Body,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ChefsService } from './chefs.service';
 
@@ -19,41 +20,20 @@ export class ChefsController {
   // @route    GET /api/v1/chefs
   // @access   Public
   @Get()
-  async getChefs() {
+  async getChefs(
+    @Query('isNewChef') isNewChef?: string,
+    @Query('isMostViewedChef') isMostViewedChef?: string,
+  ) {
     try {
-      const chefs = await this.chefsService.getAllChefs();
-      return { success: true, data: chefs };
-    } catch (error) {
-      throw new HttpException(
-        { success: false, error: error.message },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
+      const query: any = {};
+      const isNewChefBoolean = isNewChef === 'true';
+      const isMostViewedChefBoolean = isMostViewedChef === 'true';
 
-  // @desc     Get new chefs
-  // @route    GET /api/v1/chefs/new
-  // @access   Public
-  @Get('new')
-  async getNewChefs() {
-    try {
-      const chefs = await this.chefsService.getNewChefs();
-      return { success: true, data: chefs };
-    } catch (error) {
-      throw new HttpException(
-        { success: false, error: error.message },
-        HttpStatus.BAD_REQUEST,
+      const chefs = await this.chefsService.getAllChefs(
+        query,
+        isNewChefBoolean,
+        isMostViewedChefBoolean,
       );
-    }
-  }
-
-  // @desc     Get most viewed chefs
-  // @route    GET /api/v1/chefs/most-viewed
-  // @access   Public
-  @Get('most-viewed')
-  async getMostViewedChefs() {
-    try {
-      const chefs = await this.chefsService.getMostViewedChefs();
       return { success: true, data: chefs };
     } catch (error) {
       throw new HttpException(

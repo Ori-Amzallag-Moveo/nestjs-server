@@ -6,8 +6,8 @@ export interface Restaurant extends Document {
   imageSrc: string;
   chef: mongoose.Schema.Types.ObjectId;
   rating: number;
-  isNewRestaurant: boolean;
-  isOpenNow: boolean;
+  dateOfEstablishment: Date;
+  openingHours: [string, string];
   location: {
     type: string;
     coordinates: [number, number];
@@ -36,13 +36,20 @@ export const RestaurantSchema: Schema = new mongoose.Schema({
     max: [5, 'Rating cannot be more than 5'],
     required: [true, 'Please add a rating'],
   },
-  isNewRestaurant: {
-    type: Boolean,
-    required: [true, 'Please add if the restaurant is new'],
+  openingHours: {
+    type: [String],
+    required: [true, 'Please add opening hours'],
+    validate: {
+      validator: function (v: string[]) {
+        return v.length === 2;
+      },
+      message:
+        'Opening hours must be an array of two strings: [openingTime, closingTime]',
+    },
   },
-  isOpenNow: {
-    type: Boolean,
-    required: [true, 'Please add if the restaurant is open now'],
+  dateOfEstablishment: {
+    type: Date,
+    required: [true, 'Please add the date of establishment'],
   },
   location: {
     type: {
