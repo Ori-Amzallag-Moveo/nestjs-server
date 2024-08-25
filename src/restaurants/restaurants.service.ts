@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Restaurant } from './restaurant.model';
 import { getCurrentTime, isRestaurantOpen } from './helpers/restaurant.utils';
-
 @Injectable()
 export class RestaurantsService {
   constructor(
@@ -13,6 +12,8 @@ export class RestaurantsService {
 
   async getAllRestaurants(
     query: any,
+    page: number = 1,
+    limit: number = 10,
     isPopular?: string,
     isOpenNow?: string,
     isNewRestaurant?: string,
@@ -29,18 +30,21 @@ export class RestaurantsService {
       mongoQuery.dateOfEstablishment = { $gte: threeYearsAgo };
     }
 
-    const restaurants = await this.restaurantModel
+    const skip = (page - 1) * limit;
+
+    const restaurantsQuery = this.restaurantModel
       .find(mongoQuery)
       .populate('chef', 'name')
-      .exec();
+      .limit(limit)
+      .skip(skip);
+
+    const restaurants = await restaurantsQuery.exec();
 
     if (isOpenNow === 'true') {
       const currentTime = getCurrentTime();
-
       const openRestaurants = restaurants.filter((restaurant) =>
         isRestaurantOpen(restaurant, currentTime),
       );
-
       return openRestaurants;
     }
 
@@ -48,7 +52,7 @@ export class RestaurantsService {
   }
 
   async getRestaurantById(id: string): Promise<Restaurant | null> {
-    return this.restaurantModel.findById(id).exec();
+    return this.restaurantModel.findById(id).populate('chef', 'name').exec();
   }
 
   async createRestaurant(data: Partial<Restaurant>): Promise<Restaurant> {

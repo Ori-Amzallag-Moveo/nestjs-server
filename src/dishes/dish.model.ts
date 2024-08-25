@@ -4,7 +4,6 @@ export interface Dish extends Document {
   name: string;
   slug?: string;
   imageSrc: string;
-  restaurants: mongoose.Schema.Types.ObjectId[];
   ingredients: string[];
   icons?: { imgSrc: string; alt: string }[];
   price: number;
@@ -23,12 +22,6 @@ export const DishSchema: Schema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add an image source file'],
   },
-  restaurants: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Restaurant',
-    },
-  ],
   ingredients: [
     {
       type: String,

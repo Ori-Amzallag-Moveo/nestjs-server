@@ -7,7 +7,7 @@ import { Dish } from './dish.model';
 export class DishesService {
   constructor(@InjectModel('Dish') private readonly dishModel: Model<Dish>) {}
 
-  async getAllDishes(): Promise<Dish[]> {
+  async getDishes(): Promise<Dish[]> {
     return this.dishModel.find().populate('restaurants').exec();
   }
 

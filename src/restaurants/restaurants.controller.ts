@@ -14,22 +14,26 @@ import { RestaurantsService } from './restaurants.service';
 
 @Controller('restaurants')
 export class RestaurantsController {
-  constructor(private restaurantService: RestaurantsService) {}
+  constructor(private readonly restaurantService: RestaurantsService) {}
 
   // @desc     Get all restaurants, with optional 'Params'
   // @route    GET /api/v1/restaurants
   // @access   Public
   @Get()
   async getRestaurants(
-    @Query('isPopular') isPopular: string,
-    @Query('isNewRestaurant') isNewRestaurant: string,
-    @Query('isOpenNow') isOpenNow: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit?: number,
+    @Query('isPopular') isPopular?: string,
+    @Query('isNewRestaurant') isNewRestaurant?: string,
+    @Query('isOpenNow') isOpenNow?: string,
   ) {
     try {
       const query: any = {};
 
       const restaurants = await this.restaurantService.getAllRestaurants(
         query,
+        page,
+        limit,
         isPopular,
         isOpenNow,
         isNewRestaurant,
@@ -85,7 +89,6 @@ export class RestaurantsController {
   // @desc     Update restaurant
   // @route    PUT /api/v1/restaurants/:id
   // @access   Private
-  @Put()
   @Put(':id')
   async updateRestaurant(
     @Param('id') id: string,

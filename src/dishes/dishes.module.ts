@@ -8,5 +8,6 @@ import { DishSchema } from './dish.model';
   imports: [MongooseModule.forFeature([{ name: 'Dish', schema: DishSchema }])],
   providers: [DishesService],
   controllers: [DishesController],
+  exports: [DishesService], // Export the service for use in other modules
 })
 export class DishesModule {}

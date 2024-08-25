@@ -8,6 +8,7 @@ export interface Chef extends Document {
   restaurants?: mongoose.Schema.Types.ObjectId[];
   isNewChef: boolean;
   isMostViewedChef: boolean;
+  isChefOfTheWeek: boolean;
 }
 
 export const ChefSchema: Schema = new mongoose.Schema({
@@ -38,6 +39,10 @@ export const ChefSchema: Schema = new mongoose.Schema({
   isMostViewedChef: {
     type: Boolean,
     required: [true, 'Please add if the chef is popular'],
+  },
+  isChefOfTheWeek: {
+    type: Boolean,
+    required: [true, 'Please add if the chef is the chef of the week'],
   },
 });
 

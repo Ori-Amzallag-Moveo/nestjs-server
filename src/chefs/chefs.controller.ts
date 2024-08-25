@@ -16,25 +16,49 @@ import { ChefsService } from './chefs.service';
 export class ChefsController {
   constructor(private readonly chefsService: ChefsService) {}
 
-  // @desc     Get all chefs
+  // @desc     Get all chefs, with optional 'Params'
   // @route    GET /api/v1/chefs
   // @access   Public
   @Get()
   async getChefs(
+    @Query('page') page: number = 1,
+    @Query('limit') limit?: number,
     @Query('isNewChef') isNewChef?: string,
     @Query('isMostViewedChef') isMostViewedChef?: string,
   ) {
     try {
       const query: any = {};
-      const isNewChefBoolean = isNewChef === 'true';
-      const isMostViewedChefBoolean = isMostViewedChef === 'true';
 
       const chefs = await this.chefsService.getAllChefs(
         query,
-        isNewChefBoolean,
-        isMostViewedChefBoolean,
+        page,
+        limit,
+        isNewChef,
+        isMostViewedChef,
       );
       return { success: true, data: chefs };
+    } catch (error) {
+      throw new HttpException(
+        { success: false, error: error.message },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // @desc     Get chef of the week
+  // @route    GET /api/v1/chefs/chef-of-the-week
+  // @access   Public
+  @Get('chef-of-the-week')
+  async getChefOfTheWeek() {
+    try {
+      const chef = await this.chefsService.getChefOfTheWeek();
+      if (!chef) {
+        throw new HttpException(
+          { success: false, msg: 'Chef of the week not found' },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return { success: true, data: chef };
     } catch (error) {
       throw new HttpException(
         { success: false, error: error.message },

@@ -8,5 +8,6 @@ import { ChefSchema } from './chefs.model';
   imports: [MongooseModule.forFeature([{ name: 'Chef', schema: ChefSchema }])],
   providers: [ChefsService],
   controllers: [ChefsController],
+  exports: [ChefsService], // Export the service for use in other modules
 })
 export class ChefsModule {}

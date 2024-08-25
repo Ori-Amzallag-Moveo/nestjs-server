@@ -12,30 +12,43 @@ export class ChefsService {
 
   async getAllChefs(
     query: any,
-    isNewChef?: boolean,
-    isMostViewedChef?: boolean,
+    page: number = 1,
+    limit: number = 10,
+    isNewChef?: string,
+    isMostViewedChef?: string,
   ): Promise<Chef[]> {
     const mongoQuery: any = { ...query };
 
-    if (isNewChef === true) {
+    if (isNewChef === 'true') {
       mongoQuery.isNewChef = true;
     }
 
-    if (isMostViewedChef === true) {
+    if (isMostViewedChef === 'true') {
       mongoQuery.isMostViewedChef = true;
     }
 
-    const chefs = this.chefModel
+    const skip = (page - 1) * limit;
+
+    const chefsQuery = this.chefModel
       .find(mongoQuery)
       .populate('restaurants', 'name imageSrc')
-      .exec();
+      .limit(limit)
+      .skip(skip);
 
-    console.log(chefs);
+    const chefs = await chefsQuery.exec();
+
     return chefs;
   }
 
   async getChefById(id: string): Promise<Chef | null> {
     return this.chefModel.findById(id).populate('restaurants').exec();
+  }
+
+  async getChefOfTheWeek(): Promise<Chef | null> {
+    return this.chefModel
+      .findOne({ isChefOfTheWeek: true })
+      .populate('restaurants', 'name imageSrc')
+      .exec();
   }
 
   async createChef(data: Partial<Chef>): Promise<Chef> {

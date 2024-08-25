@@ -21,7 +21,7 @@ export class DishesController {
   @Get()
   async getDishes() {
     try {
-      const dishes = await this.dishesService.getAllDishes();
+      const dishes = await this.dishesService.getDishes();
       return { success: true, data: dishes };
     } catch (error) {
       throw new HttpException(
