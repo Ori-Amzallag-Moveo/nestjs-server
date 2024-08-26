@@ -20,10 +20,13 @@ export class HomepageService {
       'true',
     );
     const signatureDishes = await this.dishesService.getSignatureDishes();
+    const limitedSignatureDishes = signatureDishes.slice(0, 3);
+
     const chefOfTheWeek = await this.chefsService.getChefOfTheWeek();
 
     const formattedPopularRestaurants = popularRestaurants.map(
       (restaurant) => ({
+        restaurantId: restaurant.id,
         restaurantImg: restaurant.imageSrc,
         restaurantName: restaurant.name,
         chefName: (restaurant.chef as any)?.name || 'Unknown',
@@ -45,7 +48,7 @@ export class HomepageService {
 
     return {
       popularRestaurants: formattedPopularRestaurants,
-      signatureDishes: signatureDishes,
+      signatureDishes: limitedSignatureDishes,
       chefOfTheWeek: formattedChefOfTheWeek,
     };
   }

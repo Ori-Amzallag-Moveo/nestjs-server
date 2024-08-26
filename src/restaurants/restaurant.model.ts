@@ -5,6 +5,7 @@ export interface Restaurant extends Document {
   slug?: string;
   imageSrc: string;
   chef: mongoose.Schema.Types.ObjectId;
+  dishes: mongoose.Schema.Types.ObjectId[];
   rating: number;
   dateOfEstablishment: Date;
   openingHours: [string, string];
@@ -28,8 +29,13 @@ export const RestaurantSchema: Schema = new mongoose.Schema({
   chef: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Chef',
-    required: [false, "Please add the chef's ID"],
   },
+  dishes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Dish',
+    },
+  ],
   rating: {
     type: Number,
     min: [1, 'Rating must be at least 1'],

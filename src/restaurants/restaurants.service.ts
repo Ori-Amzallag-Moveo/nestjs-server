@@ -51,8 +51,25 @@ export class RestaurantsService {
     return restaurants;
   }
 
-  async getRestaurantById(id: string): Promise<Restaurant | null> {
-    return this.restaurantModel.findById(id).populate('chef', 'name').exec();
+  async getRestaurantById(
+    id: string,
+    meal?: string,
+  ): Promise<Restaurant | null> {
+    let mealFilter: number | null = null;
+
+    if (meal === 'breakfast') mealFilter = 1;
+    if (meal === 'lunch') mealFilter = 2;
+    if (meal === 'dinner') mealFilter = 3;
+
+    const matchCondition = mealFilter !== null ? { meals: mealFilter } : {};
+
+    return this.restaurantModel
+      .findById(id)
+      .populate({
+        path: 'dishes',
+        match: matchCondition,
+      })
+      .exec();
   }
 
   async createRestaurant(data: Partial<Restaurant>): Promise<Restaurant> {

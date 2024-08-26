@@ -51,9 +51,12 @@ export class RestaurantsController {
   // @route    GET /api/v1/restaurants/:id
   // @access   Public
   @Get(':id')
-  async getRestaurant(@Param('id') id: string) {
+  async getRestaurant(@Param('id') id: string, @Query('meal') meal?: string) {
     try {
-      const restaurant = await this.restaurantService.getRestaurantById(id);
+      const restaurant = await this.restaurantService.getRestaurantById(
+        id,
+        meal,
+      );
       if (!restaurant) {
         throw new HttpException(
           { success: false, msg: 'Restaurant not found' },
