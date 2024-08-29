@@ -1,5 +1,15 @@
 import mongoose, { Document, Schema } from 'mongoose';
-
+export interface RestaurantReturnType {
+  success: boolean;
+  data: Restaurant[] | Restaurant;
+}
+export interface RestaurantParams {
+  page?: number;
+  limit?: number;
+  isPopular?: string;
+  isNewRestaurant?: string;
+  isOpenNow?: string;
+}
 export interface Restaurant extends Document {
   name: string;
   slug?: string;

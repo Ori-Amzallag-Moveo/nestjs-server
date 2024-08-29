@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ChefsService } from './chefs.service';
-
+import { ChefParams, ChefReturnType } from './chefs.model';
 @Controller('chefs')
 export class ChefsController {
   constructor(private readonly chefsService: ChefsService) {}
@@ -20,22 +20,9 @@ export class ChefsController {
   // @route    GET /api/v1/chefs
   // @access   Public
   @Get()
-  async getChefs(
-    @Query('page') page: number = 1,
-    @Query('limit') limit?: number,
-    @Query('isNewChef') isNewChef?: string,
-    @Query('isMostViewedChef') isMostViewedChef?: string,
-  ) {
+  async getChefs(@Query() queryParams: ChefParams): Promise<ChefReturnType> {
     try {
-      const query: any = {};
-
-      const chefs = await this.chefsService.getAllChefs(
-        query,
-        page,
-        limit,
-        isNewChef,
-        isMostViewedChef,
-      );
+      const chefs = await this.chefsService.getAllChefs(queryParams);
       return { success: true, data: chefs };
     } catch (error) {
       throw new HttpException(
@@ -49,7 +36,7 @@ export class ChefsController {
   // @route    GET /api/v1/chefs/chef-of-the-week
   // @access   Public
   @Get('chef-of-the-week')
-  async getChefOfTheWeek() {
+  async getChefOfTheWeek(): Promise<ChefReturnType> {
     try {
       const chef = await this.chefsService.getChefOfTheWeek();
       if (!chef) {
@@ -71,7 +58,7 @@ export class ChefsController {
   // @route    GET /api/v1/chefs/:id
   // @access   Public
   @Get(':id')
-  async getChef(@Param('id') id: string) {
+  async getChef(@Param('id') id: string): Promise<ChefReturnType> {
     try {
       const chef = await this.chefsService.getChefById(id);
       if (!chef) {
@@ -93,7 +80,7 @@ export class ChefsController {
   // @route    POST /api/v1/chefs
   // @access   Private
   @Post()
-  async createChef(@Body() createChefDto: any) {
+  async createChef(@Body() createChefDto: any): Promise<ChefReturnType> {
     try {
       const chef = await this.chefsService.createChef(createChefDto);
       return { success: true, data: chef };
@@ -109,7 +96,10 @@ export class ChefsController {
   // @route    PUT /api/v1/chefs/:id
   // @access   Private
   @Put(':id')
-  async updateChef(@Param('id') id: string, @Body() updateChefDto: any) {
+  async updateChef(
+    @Param('id') id: string,
+    @Body() updateChefDto: any,
+  ): Promise<ChefReturnType> {
     try {
       const chef = await this.chefsService.updateChef(id, updateChefDto);
       if (!chef) {

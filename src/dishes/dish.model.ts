@@ -1,5 +1,10 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export interface DishReturnType {
+  success: boolean;
+  data: Dish[] | Dish;
+}
+
 export enum MealTime {
   Breakfast = 1,
   Lunch = 2,
@@ -46,14 +51,11 @@ export const DishSchema: Schema = new mongoose.Schema({
   },
   meals: {
     type: [Number],
-    required: true,
-    validate: {
-      validator: function (v: MealTime[]) {
-        return v.every((num) => num >= 1 && num <= 3);
-      },
-      message: (props) =>
-        `${props.value} contains an invalid meal time! Only values between 1 and 3 are allowed.`,
+    enum: {
+      values: [1, 2, 3],
+      message: '{VALUE} is not supported',
     },
+    required: true,
   },
 
   isSignature: {

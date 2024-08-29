@@ -11,7 +11,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
-
+import { RestaurantParams } from './restaurant.model';
+import { RestaurantReturnType } from './restaurant.model';
 @Controller('restaurants')
 export class RestaurantsController {
   constructor(private readonly restaurantService: RestaurantsService) {}
@@ -21,23 +22,11 @@ export class RestaurantsController {
   // @access   Public
   @Get()
   async getRestaurants(
-    @Query('page') page: number = 1,
-    @Query('limit') limit?: number,
-    @Query('isPopular') isPopular?: string,
-    @Query('isNewRestaurant') isNewRestaurant?: string,
-    @Query('isOpenNow') isOpenNow?: string,
-  ) {
+    @Query() queryParams: RestaurantParams,
+  ): Promise<RestaurantReturnType> {
     try {
-      const query: any = {};
-
-      const restaurants = await this.restaurantService.getAllRestaurants(
-        query,
-        page,
-        limit,
-        isPopular,
-        isOpenNow,
-        isNewRestaurant,
-      );
+      const restaurants =
+        await this.restaurantService.getAllRestaurants(queryParams);
       return { success: true, data: restaurants };
     } catch (error) {
       throw new HttpException(
@@ -51,7 +40,10 @@ export class RestaurantsController {
   // @route    GET /api/v1/restaurants/:id
   // @access   Public
   @Get(':id')
-  async getRestaurant(@Param('id') id: string, @Query('meal') meal?: string) {
+  async getRestaurant(
+    @Param('id') id: string,
+    @Query('meal') meal?: string,
+  ): Promise<RestaurantReturnType> {
     try {
       const restaurant = await this.restaurantService.getRestaurantById(
         id,
@@ -76,7 +68,9 @@ export class RestaurantsController {
   // @route    POST /api/v1/restaurants
   // @access   Private
   @Post()
-  async createRestaurant(@Body() createRestaurantDto: any) {
+  async createRestaurant(
+    @Body() createRestaurantDto: any,
+  ): Promise<RestaurantReturnType> {
     try {
       const restaurant =
         await this.restaurantService.createRestaurant(createRestaurantDto);
@@ -96,7 +90,7 @@ export class RestaurantsController {
   async updateRestaurant(
     @Param('id') id: string,
     @Body() updateRestaurantDto: any,
-  ) {
+  ): Promise<RestaurantReturnType> {
     try {
       const restaurant = await this.restaurantService.updateRestaurant(
         id,

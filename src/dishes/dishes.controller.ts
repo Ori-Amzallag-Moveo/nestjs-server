@@ -10,6 +10,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { DishesService } from './dishes.service';
+import { DishReturnType } from './dish.model';
 
 @Controller('dishes')
 export class DishesController {
@@ -19,7 +20,7 @@ export class DishesController {
   // @route    GET /api/v1/dishes
   // @access   Public
   @Get()
-  async getDishes() {
+  async getDishes(): Promise<DishReturnType> {
     try {
       const dishes = await this.dishesService.getDishes();
       return { success: true, data: dishes };
@@ -35,7 +36,7 @@ export class DishesController {
   // @route    GET /api/v1/dishes/signature
   // @access   Public
   @Get('signature')
-  async getSignatureDishes() {
+  async getSignatureDishes(): Promise<DishReturnType> {
     try {
       const dishes = await this.dishesService.getSignatureDishes();
       return { success: true, data: dishes };
@@ -51,7 +52,7 @@ export class DishesController {
   // @route    GET /api/v1/dishes/:id
   // @access   Public
   @Get(':id')
-  async getDish(@Param('id') id: string) {
+  async getDish(@Param('id') id: string): Promise<DishReturnType> {
     try {
       const dish = await this.dishesService.getDishById(id);
       if (!dish) {
@@ -73,7 +74,7 @@ export class DishesController {
   // @route    POST /api/v1/dishes
   // @access   Private
   @Post()
-  async createDish(@Body() createDishDto: any) {
+  async createDish(@Body() createDishDto: any): Promise<DishReturnType> {
     try {
       const dish = await this.dishesService.createDish(createDishDto);
       return { success: true, data: dish };
@@ -89,7 +90,10 @@ export class DishesController {
   // @route    PUT /api/v1/dishes/:id
   // @access   Private
   @Put(':id')
-  async updateDish(@Param('id') id: string, @Body() updateDishDto: any) {
+  async updateDish(
+    @Param('id') id: string,
+    @Body() updateDishDto: any,
+  ): Promise<DishReturnType> {
     try {
       const dish = await this.dishesService.updateDish(id, updateDishDto);
       if (!dish) {

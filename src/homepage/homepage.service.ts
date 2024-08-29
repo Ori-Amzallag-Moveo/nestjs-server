@@ -13,15 +13,13 @@ export class HomepageService {
   ) {}
 
   async getHomepageData(): Promise<homepageData> {
-    const popularRestaurants = await this.restaurantsService.getAllRestaurants(
-      {},
-      1,
-      3,
-      'true',
-    );
+    const popularRestaurants = await this.restaurantsService.getAllRestaurants({
+      page: 1,
+      limit: 3,
+      isPopular: 'true',
+    });
     const signatureDishes = await this.dishesService.getSignatureDishes();
     const limitedSignatureDishes = signatureDishes.slice(0, 3);
-
     const chefOfTheWeek = await this.chefsService.getChefOfTheWeek();
 
     const formattedPopularRestaurants = popularRestaurants.map(
@@ -29,7 +27,7 @@ export class HomepageService {
         restaurantId: restaurant.id,
         restaurantImg: restaurant.imageSrc,
         restaurantName: restaurant.name,
-        chefName: (restaurant.chef as any)?.name || 'Unknown',
+        chefName: (restaurant.chef as any)?.name,
         rating: restaurant.rating || 0,
       }),
     );

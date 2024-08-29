@@ -3,6 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Restaurant } from './restaurant.model';
 import { getCurrentTime, isRestaurantOpen } from './helpers/restaurant.utils';
+import { MealTime } from 'src/dishes/dish.model';
+import { RestaurantParams } from './restaurant.model';
+
 @Injectable()
 export class RestaurantsService {
   constructor(
@@ -11,14 +14,17 @@ export class RestaurantsService {
   ) {}
 
   async getAllRestaurants(
-    query: any,
-    page: number = 1,
-    limit: number = 10,
-    isPopular?: string,
-    isOpenNow?: string,
-    isNewRestaurant?: string,
+    queryParams: RestaurantParams,
   ): Promise<Restaurant[]> {
-    const mongoQuery: any = { ...query };
+    const {
+      page = 1,
+      limit = 10,
+      isPopular,
+      isNewRestaurant,
+      isOpenNow,
+    } = queryParams;
+
+    const mongoQuery: any = {};
 
     if (isPopular === 'true') {
       mongoQuery.rating = { $gte: 4 };
@@ -47,19 +53,25 @@ export class RestaurantsService {
       );
       return openRestaurants;
     }
-
     return restaurants;
   }
 
-  async getRestaurantById(
-    id: string,
-    meal?: string,
-  ): Promise<Restaurant | null> {
-    let mealFilter: number | null = null;
-
-    if (meal === 'breakfast') mealFilter = 1;
-    if (meal === 'lunch') mealFilter = 2;
-    if (meal === 'dinner') mealFilter = 3;
+  async getRestaurantById(id: string, meal?: string): Promise<Restaurant> {
+    let mealFilter: number = null;
+    switch (meal) {
+      case 'breakfast':
+        mealFilter = MealTime.Breakfast;
+        break;
+      case 'lunch':
+        mealFilter = MealTime.Lunch;
+        break;
+      case 'dinner':
+        mealFilter = MealTime.Dinner;
+        break;
+      default:
+        mealFilter = null;
+        break;
+    }
 
     const matchCondition = mealFilter !== null ? { meals: mealFilter } : {};
 

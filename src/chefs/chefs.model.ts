@@ -10,6 +10,17 @@ export interface Chef extends Document {
   isMostViewedChef: boolean;
   isChefOfTheWeek: boolean;
 }
+export interface ChefParams {
+  page?: number;
+  limit?: number;
+  isNewChef?: string;
+  isMostViewedChef?: string;
+}
+
+export interface ChefReturnType {
+  success: boolean;
+  data: Chef[] | Chef;
+}
 
 export const ChefSchema: Schema = new mongoose.Schema({
   name: {

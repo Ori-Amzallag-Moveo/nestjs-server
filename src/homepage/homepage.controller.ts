@@ -1,12 +1,13 @@
 import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { HomepageService } from './homepage.service';
+import { HomepageReturnType } from './homepage.model';
 
 @Controller()
 export class HomepageController {
   constructor(private readonly homepageService: HomepageService) {}
 
   @Get()
-  async getHomepageData(): Promise<{ success: boolean; data: any }> {
+  async getHomepageData(): Promise<HomepageReturnType> {
     try {
       const response = await this.homepageService.getHomepageData();
 
