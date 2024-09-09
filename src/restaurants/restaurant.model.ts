@@ -9,6 +9,9 @@ export interface RestaurantParams {
   isPopular?: string;
   isNewRestaurant?: string;
   isOpenNow?: string;
+  rating?: string;
+  distance?: string;
+  range?: string;
 }
 export interface Restaurant extends Document {
   name: string;

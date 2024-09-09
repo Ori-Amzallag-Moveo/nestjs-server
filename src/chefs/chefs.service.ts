@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Chef, ChefParams } from './chefs.model';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class ChefsService {
   async getAllChefs(queryParams: ChefParams): Promise<Chef[]> {
     const { page = 1, limit = 10, isNewChef, isMostViewedChef } = queryParams;
 
-    const mongoQuery: any = {};
+    const mongoQuery: FilterQuery<Chef> = {};
 
     if (isNewChef === 'true') {
       mongoQuery.isNewChef = true;
@@ -43,7 +43,7 @@ export class ChefsService {
   async getChefOfTheWeek(): Promise<Chef | null> {
     return this.chefModel
       .findOne({ isChefOfTheWeek: true })
-      .populate('restaurants', 'name imageSrc')
+      .populate('restaurants', 'id name imageSrc')
       .exec();
   }
 

@@ -74,7 +74,7 @@ export class DishesController {
   // @route    POST /api/v1/dishes
   // @access   Private
   @Post()
-  async createDish(@Body() createDishDto: any): Promise<DishReturnType> {
+  async createDish(@Body() createDishDto): Promise<DishReturnType> {
     try {
       const dish = await this.dishesService.createDish(createDishDto);
       return { success: true, data: dish };
@@ -92,7 +92,7 @@ export class DishesController {
   @Put(':id')
   async updateDish(
     @Param('id') id: string,
-    @Body() updateDishDto: any,
+    @Body() updateDishDto,
   ): Promise<DishReturnType> {
     try {
       const dish = await this.dishesService.updateDish(id, updateDishDto);

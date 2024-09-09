@@ -5,6 +5,8 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { DishesModule } from './dishes/dishes.module';
 import { ChefsModule } from './chefs/chefs.module';
 import { HomepageModule } from './homepage/homepage.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { HomepageModule } from './homepage/homepage.module';
     DishesModule,
     ChefsModule,
     HomepageModule,
+    UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

@@ -3,7 +3,8 @@ import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { DishesService } from 'src/dishes/dishes.service';
 import { ChefsService } from 'src/chefs/chefs.service';
 import { homepageData } from './homepage.model';
-
+import { Chef } from 'src/chefs/chefs.model';
+import { Restaurant } from 'src/restaurants/restaurant.model';
 @Injectable()
 export class HomepageService {
   constructor(
@@ -27,7 +28,7 @@ export class HomepageService {
         restaurantId: restaurant.id,
         restaurantImg: restaurant.imageSrc,
         restaurantName: restaurant.name,
-        chefName: (restaurant.chef as any)?.name,
+        chefName: (restaurant.chef as unknown as Chef)?.name,
         rating: restaurant.rating || 0,
       }),
     );
@@ -38,8 +39,9 @@ export class HomepageService {
           imageSrc: chefOfTheWeek.imageSrc,
           description: chefOfTheWeek.description,
           restaurants: chefOfTheWeek.restaurants.map((restaurant) => ({
-            restaurantImg: (restaurant as any).imageSrc,
-            restaurantName: (restaurant as any).name,
+            restaurantId: (restaurant as unknown as Restaurant).id,
+            restaurantImg: (restaurant as unknown as Restaurant).imageSrc,
+            restaurantName: (restaurant as unknown as Restaurant).name,
           })),
         }
       : null;

@@ -69,7 +69,7 @@ export class RestaurantsController {
   // @access   Private
   @Post()
   async createRestaurant(
-    @Body() createRestaurantDto: any,
+    @Body() createRestaurantDto,
   ): Promise<RestaurantReturnType> {
     try {
       const restaurant =
@@ -89,7 +89,7 @@ export class RestaurantsController {
   @Put(':id')
   async updateRestaurant(
     @Param('id') id: string,
-    @Body() updateRestaurantDto: any,
+    @Body() updateRestaurantDto,
   ): Promise<RestaurantReturnType> {
     try {
       const restaurant = await this.restaurantService.updateRestaurant(

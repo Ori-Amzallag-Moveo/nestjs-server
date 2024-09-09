@@ -80,7 +80,7 @@ export class ChefsController {
   // @route    POST /api/v1/chefs
   // @access   Private
   @Post()
-  async createChef(@Body() createChefDto: any): Promise<ChefReturnType> {
+  async createChef(@Body() createChefDto): Promise<ChefReturnType> {
     try {
       const chef = await this.chefsService.createChef(createChefDto);
       return { success: true, data: chef };
@@ -98,7 +98,7 @@ export class ChefsController {
   @Put(':id')
   async updateChef(
     @Param('id') id: string,
-    @Body() updateChefDto: any,
+    @Body() updateChefDto,
   ): Promise<ChefReturnType> {
     try {
       const chef = await this.chefsService.updateChef(id, updateChefDto);

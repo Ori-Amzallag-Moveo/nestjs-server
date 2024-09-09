@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Restaurant } from './restaurant.model';
 import { getCurrentTime, isRestaurantOpen } from './helpers/restaurant.utils';
 import { MealTime } from 'src/dishes/dish.model';
@@ -22,9 +22,17 @@ export class RestaurantsService {
       isPopular,
       isNewRestaurant,
       isOpenNow,
+      rating,
+      distance,
+      range,
     } = queryParams;
 
-    const mongoQuery: any = {};
+    const mongoQuery: FilterQuery<Restaurant> = {};
+
+    if (rating) {
+      const ratingsArray = rating.split(',').map(Number);
+      mongoQuery.rating = { $in: ratingsArray };
+    }
 
     if (isPopular === 'true') {
       mongoQuery.rating = { $gte: 4 };
@@ -36,24 +44,48 @@ export class RestaurantsService {
       mongoQuery.dateOfEstablishment = { $gte: threeYearsAgo };
     }
 
-    const skip = (page - 1) * limit;
+    if (distance) {
+      const distanceInMeters = Number(distance) * 1000;
+      mongoQuery.location = {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [34.7818, 32.0853],
+          },
+          $maxDistance: distanceInMeters,
+        },
+      };
+    }
 
     const restaurantsQuery = this.restaurantModel
       .find(mongoQuery)
       .populate('chef', 'name')
-      .limit(limit)
-      .skip(skip);
+      .populate('dishes');
 
-    const restaurants = await restaurantsQuery.exec();
+    const allRestaurants = await restaurantsQuery.exec();
+
+    let filteredRestaurants = allRestaurants;
+    if (range) {
+      const [minPrice, maxPrice] = range.split(',').map(Number);
+      filteredRestaurants = allRestaurants.filter((restaurant) => {
+        return restaurant.dishes.every(
+          (dish: any) => dish.price >= minPrice && dish.price <= maxPrice,
+        );
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const paginatedRestaurants = filteredRestaurants.slice(skip, skip + limit);
 
     if (isOpenNow === 'true') {
       const currentTime = getCurrentTime();
-      const openRestaurants = restaurants.filter((restaurant) =>
+      const openRestaurants = paginatedRestaurants.filter((restaurant) =>
         isRestaurantOpen(restaurant, currentTime),
       );
       return openRestaurants;
     }
-    return restaurants;
+
+    return paginatedRestaurants;
   }
 
   async getRestaurantById(id: string, meal?: string): Promise<Restaurant> {
@@ -80,6 +112,10 @@ export class RestaurantsService {
       .populate({
         path: 'dishes',
         match: matchCondition,
+      })
+      .populate({
+        path: 'chef',
+        select: 'name',
       })
       .exec();
   }
