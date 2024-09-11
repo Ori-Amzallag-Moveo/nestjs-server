@@ -4,18 +4,21 @@ export interface User extends Document {
   email: string;
   password?: string;
 }
-export const UserSchema: Schema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Please add a name'],
-    unique: true,
-    maxlength: [50, 'Name cannot be more than 50 characters'],
+export const UserSchema: Schema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: [true, 'Please add a name'],
+      unique: true,
+      maxlength: [50, 'Name cannot be more than 50 characters'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Please add a password'],
+    },
   },
-  password: {
-    type: String,
-    required: [true, 'Please add a password'],
-  },
-});
+  { versionKey: false },
+);
 
 const User = mongoose.model<User>('User', UserSchema);
 

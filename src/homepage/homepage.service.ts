@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { RestaurantsService } from 'src/restaurants/restaurants.service';
-import { DishesService } from 'src/dishes/dishes.service';
-import { ChefsService } from 'src/chefs/chefs.service';
+
+import { Chef } from '../chefs/chefs.model';
+import { ChefsService } from '../chefs/chefs.service';
+import { DishesService } from '../dishes/dishes.service';
+import { Restaurant } from '../restaurants/restaurant.model';
+import { RestaurantsService } from '../restaurants/restaurants.service';
 import { homepageData } from './homepage.model';
-import { Chef } from 'src/chefs/chefs.model';
-import { Restaurant } from 'src/restaurants/restaurant.model';
+
 @Injectable()
 export class HomepageService {
   constructor(

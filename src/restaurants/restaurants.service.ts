@@ -1,16 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { Restaurant } from './restaurant.model';
+
+import { GlobalStatsService } from 'src/global-stats/global.stats.service';
+import { MealTime } from '../dishes/dish.model';
 import { getCurrentTime, isRestaurantOpen } from './helpers/restaurant.utils';
-import { MealTime } from 'src/dishes/dish.model';
-import { RestaurantParams } from './restaurant.model';
+import { Restaurant, RestaurantParams } from './restaurant.model';
 
 @Injectable()
 export class RestaurantsService {
   constructor(
     @InjectModel('Restaurant')
     private readonly restaurantModel: Model<Restaurant>,
+    private readonly globalStatsService: GlobalStatsService,
   ) {}
 
   async getAllRestaurants(
@@ -24,7 +26,7 @@ export class RestaurantsService {
       isOpenNow,
       rating,
       distance,
-      range,
+      priceRange,
     } = queryParams;
 
     const mongoQuery: FilterQuery<Restaurant> = {};
@@ -59,14 +61,14 @@ export class RestaurantsService {
 
     const restaurantsQuery = this.restaurantModel
       .find(mongoQuery)
-      .populate('chef', 'name')
+      .populate('chef', 'name') // filter all and then paginate and then populate.
       .populate('dishes');
 
     const allRestaurants = await restaurantsQuery.exec();
 
     let filteredRestaurants = allRestaurants;
-    if (range) {
-      const [minPrice, maxPrice] = range.split(',').map(Number);
+    if (priceRange) {
+      const [minPrice, maxPrice] = priceRange.split(',').map(Number);
       filteredRestaurants = allRestaurants.filter((restaurant) => {
         return restaurant.dishes.every(
           (dish: any) => dish.price >= minPrice && dish.price <= maxPrice,
@@ -121,6 +123,7 @@ export class RestaurantsService {
   }
 
   async createRestaurant(data: Partial<Restaurant>): Promise<Restaurant> {
+    await this.globalStatsService.updateStats('totalRestaurants', 1);
     const restaurant = new this.restaurantModel(data);
     return restaurant.save();
   }
@@ -134,7 +137,21 @@ export class RestaurantsService {
       .exec();
   }
 
-  async deleteRestaurant(id: string): Promise<Restaurant | null> {
-    return this.restaurantModel.findByIdAndDelete(id).exec();
+  async increaseClicks(id: string): Promise<Restaurant> {
+    try {
+      const updatedRestaurant = await this.restaurantModel.findByIdAndUpdate(
+        id,
+        { $inc: { clicks: 1 } },
+        { new: true },
+      );
+
+      if (!updatedRestaurant) {
+        throw new NotFoundException('Restaurant not found');
+      }
+      await this.globalStatsService.updateStats('totalClicks', 1);
+      return updatedRestaurant;
+    } catch (error) {
+      throw new Error(`Failed to update clicks: ${error.message}`);
+    }
   }
 }

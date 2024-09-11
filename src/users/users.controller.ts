@@ -1,12 +1,14 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
   HttpException,
   HttpStatus,
+  Post,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+
 import { User } from './users.model';
+import { UsersService } from './users.service';
+import { Public } from 'src/decorator';
 
 @Controller('users')
 export class UsersController {
@@ -14,11 +16,12 @@ export class UsersController {
 
   // @desc     Register a new user
   // @route    POST /users
+  @Public()
   @Post()
   async create(@Body() createUserDto: User) {
     try {
-      const user = await this.usersService.create(createUserDto);
-      return { success: true, data: user };
+      const token = await this.usersService.create(createUserDto);
+      return token;
     } catch (error) {
       throw new HttpException(
         { success: false, error: error.message },

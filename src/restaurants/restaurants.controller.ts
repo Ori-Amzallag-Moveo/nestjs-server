@@ -1,18 +1,17 @@
 import {
-  Controller,
-  Delete,
-  Get,
-  Post,
-  Put,
-  Param,
   Body,
+  Controller,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
+  Put,
   Query,
 } from '@nestjs/common';
+
+import { RestaurantParams, RestaurantReturnType } from './restaurant.model';
 import { RestaurantsService } from './restaurants.service';
-import { RestaurantParams } from './restaurant.model';
-import { RestaurantReturnType } from './restaurant.model';
 @Controller('restaurants')
 export class RestaurantsController {
   constructor(private readonly restaurantService: RestaurantsService) {}
@@ -111,25 +110,13 @@ export class RestaurantsController {
     }
   }
 
-  // @desc     Delete restaurant
-  // @route    DELETE /api/v1/restaurants/:id
-  // @access   Private
-  @Delete(':id')
-  async deleteRestaurant(@Param('id') id: string) {
+  @Put(':id/click')
+  async increaseRestaurantClicks(@Param('id') id: string) {
     try {
-      const restaurant = await this.restaurantService.deleteRestaurant(id);
-      if (!restaurant) {
-        throw new HttpException(
-          { success: false, msg: 'Restaurant not found' },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return { success: true, msg: 'Restaurant deleted' };
+      const updatedRestaurant = await this.restaurantService.increaseClicks(id);
+      return { success: true, data: updatedRestaurant };
     } catch (error) {
-      throw new HttpException(
-        { success: false, error: error.message },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

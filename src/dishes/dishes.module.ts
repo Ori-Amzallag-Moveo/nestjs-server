@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DishesService } from './dishes.service';
-import { DishesController } from './dishes.controller';
+
 import { DishSchema } from './dish.model';
+import { DishesController } from './dishes.controller';
+import { DishesService } from './dishes.service';
+import { GlobalStatsModule } from 'src/global-stats/global.stats.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Dish', schema: DishSchema }])],
+  imports: [
+    GlobalStatsModule,
+    MongooseModule.forFeature([{ name: 'Dish', schema: DishSchema }]),
+  ],
   providers: [DishesService],
   controllers: [DishesController],
   exports: [DishesService],

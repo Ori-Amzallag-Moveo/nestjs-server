@@ -1,15 +1,17 @@
 import {
-  Controller,
-  Post,
+  BadRequestException,
   Body,
+  Controller,
   HttpException,
   HttpStatus,
-  BadRequestException,
+  Post,
   Response,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { User } from 'src/users/users.model';
+
 import { Response as ExpressResponse } from 'express';
+import { User } from 'src/users/users.model';
+import { AuthService } from './auth.service';
+import { Public } from 'src/decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +19,7 @@ export class AuthController {
 
   // @desc     Login exist user
   // @route    POST /auth/login
+  @Public()
   @Post('login')
   async login(@Body() req: User, @Response() response: ExpressResponse) {
     try {
@@ -24,16 +27,11 @@ export class AuthController {
       if (!user) {
         throw new BadRequestException('Invalid Credentials');
       }
-      const jwtToken = await this.authService.login(user);
-      response.cookie('jwt', jwtToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 3600000,
-      });
-      return response.send({
+      const jwtToken = await this.authService.tokenAccess(user);
+      return response.status(HttpStatus.OK).json({
         success: true,
         message: 'Login successful',
+        access_token: jwtToken.access_token, // Include the token in the response
       });
     } catch (error) {
       throw new HttpException(

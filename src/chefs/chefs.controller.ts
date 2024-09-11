@@ -1,17 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
   Body,
+  Controller,
+  Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
+  Put,
   Query,
 } from '@nestjs/common';
-import { ChefsService } from './chefs.service';
+
 import { ChefParams, ChefReturnType } from './chefs.model';
+import { ChefsService } from './chefs.service';
 @Controller('chefs')
 export class ChefsController {
   constructor(private readonly chefsService: ChefsService) {}

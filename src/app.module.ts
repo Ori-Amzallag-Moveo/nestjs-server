@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RestaurantsModule } from './restaurants/restaurants.module';
-import { DishesModule } from './dishes/dishes.module';
-import { ChefsModule } from './chefs/chefs.module';
-import { HomepageModule } from './homepage/homepage.module';
-import { UsersModule } from './users/users.module';
+
 import { AuthModule } from './auth/auth.module';
+import { ChefsModule } from './chefs/chefs.module';
+import { DishesModule } from './dishes/dishes.module';
+import { GlobalStatsModule } from './global-stats/global.stats.module';
+import { HomepageModule } from './homepage/homepage.module';
+import { RestaurantsModule } from './restaurants/restaurants.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     HomepageModule,
     UsersModule,
     AuthModule,
+    GlobalStatsModule,
   ],
 })
 export class AppModule {}

@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
-import { User } from 'src/users/users.model';
 import * as bcrypt from 'bcryptjs';
+
+import { User } from '../users/users.model';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: any) {
+  async tokenAccess(user: any) {
     const payload = { username: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),

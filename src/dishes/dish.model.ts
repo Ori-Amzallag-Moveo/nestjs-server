@@ -22,47 +22,50 @@ export interface Dish extends Document {
   isSignature?: boolean;
 }
 
-export const DishSchema: Schema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please add a name'],
-    unique: true,
-    maxlength: [50, 'Name cannot be more than 50 characters'],
-  },
-  slug: String,
-  imageSrc: {
-    type: String,
-    required: [true, 'Please add an image source file'],
-  },
-  ingredients: [
-    {
+export const DishSchema: Schema = new mongoose.Schema(
+  {
+    name: {
       type: String,
+      required: [true, 'Please add a name'],
+      unique: true,
+      maxlength: [50, 'Name cannot be more than 50 characters'],
     },
-  ],
-  icons: [
-    {
-      imageSrc: { type: String, required: true },
-      alt: { type: String, required: true },
+    slug: String,
+    imageSrc: {
+      type: String,
+      required: [true, 'Please add an image source file'],
     },
-  ],
-  price: {
-    type: Number,
-    required: [true, 'Please add a price'],
-  },
-  meals: {
-    type: [Number],
-    enum: {
-      values: [1, 2, 3],
-      message: '{VALUE} is not supported',
+    ingredients: [
+      {
+        type: String,
+      },
+    ],
+    icons: [
+      {
+        imageSrc: { type: String, required: true },
+        alt: { type: String, required: true },
+      },
+    ],
+    price: {
+      type: Number,
+      required: [true, 'Please add a price'],
     },
-    required: true,
-  },
+    meals: {
+      type: [Number],
+      enum: {
+        values: [1, 2, 3],
+        message: '{VALUE} is not supported',
+      },
+      required: true,
+    },
 
-  isSignature: {
-    type: Boolean,
-    required: [true, 'Please add if the dish is signature'],
+    isSignature: {
+      type: Boolean,
+      required: [true, 'Please add if the dish is signature'],
+    },
   },
-});
+  { versionKey: false },
+);
 
 const Dish = mongoose.model<Dish>('Dish', DishSchema);
 
